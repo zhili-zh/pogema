@@ -1,6 +1,7 @@
 from functools import reduce
 
 import numpy as np
+import pydantic
 
 from pogema import GridConfig
 from pogema.integrations.make_pogema import pogema_v0
@@ -11,6 +12,17 @@ def test_gym_creation():
 
     env = gymnasium.make("Pogema-v0", grid_config=GridConfig(integration='gymnasium'))
     env.reset()
+
+
+def test_wandb_pydantic_v2_and_pogema_import_together():
+    import wandb
+    from pydantic import v1 as pydantic_v1
+    import pogema
+
+    assert int(pydantic.VERSION.split('.')[0]) >= 2
+    assert hasattr(pydantic_v1, 'BaseModel')
+    assert hasattr(wandb, '__version__')
+    assert hasattr(pogema, 'GridConfig')
 
 
 def test_integrations():

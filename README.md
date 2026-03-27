@@ -22,6 +22,14 @@ Just install from PyPI:
 
 ```pip install pogema```
 
+Pogema now supports both late `pydantic v1` and `pydantic v2` by using the `pydantic.v1` compatibility namespace internally. If your research stack also requires tools such as `wandb`, you can keep a `pydantic v2` installation and use Pogema in the same environment.
+
+Example:
+
+```bash
+pip install "pydantic>=2,<3" wandb pogema
+```
+
 ## Using Example
 
 ```python
