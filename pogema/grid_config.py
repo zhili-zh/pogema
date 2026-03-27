@@ -1,6 +1,6 @@
 import sys
 from typing import Optional, Union
-from pydantic import validator, root_validator
+from pydantic import v1 as pydantic_v1
 
 from pogema.utils import CommonSettings
 
@@ -31,7 +31,7 @@ class GridConfig(CommonSettings, ):
     max_episode_steps: int = 64
     auto_reset: Optional[bool] = None
 
-    @root_validator
+    @pydantic_v1.root_validator
     def validate_dimensions_and_positions(cls, values):
         width_provided = values.get('width') is not None
         height_provided = values.get('height') is not None
@@ -67,7 +67,7 @@ class GridConfig(CommonSettings, ):
         
         return values
 
-    @validator('seed')
+    @pydantic_v1.validator('seed')
     def seed_initialization(cls, v):
         assert v is None or (0 <= v < sys.maxsize), "seed must be in [0, " + str(sys.maxsize) + ']'
         return v
@@ -81,24 +81,24 @@ class GridConfig(CommonSettings, ):
                 assert 1 <= v <= 4096, f"{field_name} must be in [1, 4096]"
         return v
 
-    @validator('size')
+    @pydantic_v1.validator('size')
     def size_restrictions(cls, v):
         return cls._validate_dimension(v, 'size')
 
-    @validator('width')
+    @pydantic_v1.validator('width')
     def width_restrictions(cls, v):
         return cls._validate_dimension(v, 'width')
 
-    @validator('height')
+    @pydantic_v1.validator('height')
     def height_restrictions(cls, v):
         return cls._validate_dimension(v, 'height')
 
-    @validator('density')
+    @pydantic_v1.validator('density')
     def density_restrictions(cls, v):
         assert 0.0 <= v <= 1, "density must be in [0, 1]"
         return v
 
-    @validator('agents_xy')
+    @pydantic_v1.validator('agents_xy')
     def agents_xy_validation(cls, v, values):
         if v is not None:
             if not isinstance(v, (list, tuple)):
@@ -110,7 +110,7 @@ class GridConfig(CommonSettings, ):
                     raise ValueError("Position coordinates must be integers")
         return v
 
-    @validator('targets_xy')
+    @pydantic_v1.validator('targets_xy')
     def targets_xy_validation(cls, v, values):
         if v is not None:
             if not v or not isinstance(v, (list, tuple)):
@@ -152,7 +152,7 @@ class GridConfig(CommonSettings, ):
                 raise IndexError(f"Position is out of bounds! {position} is not in [{0}, {height}] x [{0}, {width}]")
 
 
-    @validator('num_agents', always=True)
+    @pydantic_v1.validator('num_agents', always=True)
     def num_agents_must_be_positive(cls, v, values):
         if v is None:
             if values['agents_xy']:
@@ -162,12 +162,12 @@ class GridConfig(CommonSettings, ):
         assert 1 <= v <= 10000000, "num_agents must be in [1, 10000000]"
         return v
 
-    @validator('obs_radius')
+    @pydantic_v1.validator('obs_radius')
     def obs_radius_must_be_positive(cls, v):
         assert 1 <= v <= 128, "obs_radius must be in [1, 128]"
         return v
 
-    @validator('map', always=True)
+    @pydantic_v1.validator('map', always=True)
     def map_validation(cls, v, values):
         if v is None:
             return None
@@ -203,11 +203,11 @@ class GridConfig(CommonSettings, ):
 
         return v
 
-    @validator('possible_agents_xy')
+    @pydantic_v1.validator('possible_agents_xy')
     def possible_agents_xy_validation(cls, v):
         return v
 
-    @validator('possible_targets_xy')
+    @pydantic_v1.validator('possible_targets_xy')
     def possible_targets_xy_validation(cls, v):
         return v
 

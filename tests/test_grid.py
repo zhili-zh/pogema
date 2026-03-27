@@ -1,5 +1,5 @@
 import numpy as np
-from pydantic import ValidationError
+from pydantic import v1 as pydantic_v1
 
 from pogema import GridConfig
 from pogema.grid import Grid
@@ -66,16 +66,16 @@ def test_overflow_warning():
 
 
 def test_edge_cases():
-    with pytest.raises(ValidationError):
+    with pytest.raises(pydantic_v1.ValidationError):
         GridConfig(seed=1, obs_radius=2, size=1, num_agents=1, density=0.4)
 
-    with pytest.raises(ValidationError):
+    with pytest.raises(pydantic_v1.ValidationError):
         GridConfig(seed=1, obs_radius=2, size=4, num_agents=0, density=0.4)
 
     with pytest.raises(OverflowError):
         Grid(GridConfig(seed=1, obs_radius=2, size=4, num_agents=1, density=1.0))
 
-    with pytest.raises(ValidationError):
+    with pytest.raises(pydantic_v1.ValidationError):
         Grid(GridConfig(seed=1, obs_radius=2, size=4, num_agents=1, density=2.0))
 
 

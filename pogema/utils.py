@@ -1,6 +1,6 @@
 import sys
 
-from pydantic import BaseModel
+from pydantic import v1 as pydantic_v1
 
 from typing_extensions import Literal
 
@@ -84,7 +84,7 @@ def render_grid(obstacles, positions_xy=None, targets_xy=None, is_active=None, m
             return outfile.getvalue()
 
 
-class CommonSettings(BaseModel):
+class CommonSettings(pydantic_v1.BaseModel):
     MOVES: list = [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1], ]
     FREE: Literal[0] = 0
     OBSTACLE: Literal[1] = 1

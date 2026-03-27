@@ -41,7 +41,7 @@ setup(
     install_requires=[
         "gymnasium==0.28.1",
         "numpy>1.23.5,<=1.26.4",
-        "pydantic>=1.8.2,<=1.9.1",
+        "pydantic>=1.10.17,<3",
     ],
     extras_require={
 
