@@ -40,7 +40,7 @@ setup(
     url='https://github.com/Cognitive-AI-Systems/pogema',
     install_requires=[
         "gymnasium==0.28.1",
-        "numpy>1.23.5,<=1.26.4",
+        "numpy>1.23.5,<3",
         "pydantic>=1.10.17,<3",
     ],
     extras_require={

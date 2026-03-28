@@ -108,6 +108,26 @@ def test_mapf_observation():
     run_episode(env=env)
 
 
+def test_pomapf_nearest_target_observation():
+    env = pogema_v0(GridConfig(num_agents=2, size=6, obs_radius=2, density=0.3, seed=42, on_target='finish',
+                               observation_type='POMAPF_NEAREST_TARGET'))
+    obs, info = env.reset()
+    assert 'nearest_target' in obs[0]
+    assert 'nearest_target_owner' in obs[0]
+    assert obs[0]['nearest_target'].shape == (5, 5)
+    assert obs[0]['nearest_target_owner'].shape == (2,)
+    run_episode(env=env)
+
+
+def test_pomapf_all_targets_observation():
+    env = pogema_v0(GridConfig(num_agents=2, size=6, obs_radius=2, density=0.3, seed=42, on_target='finish',
+                               observation_type='POMAPF_ALL_TARGETS'))
+    obs, info = env.reset()
+    assert 'target_layers' in obs[0]
+    assert obs[0]['target_layers'].shape == (2, 5, 5)
+    run_episode(env=env)
+
+
 def test_standard_pogema_animation():
     env = pogema_v0(GridConfig(num_agents=2, size=6, obs_radius=2, density=0.3, seed=42, on_target='finish'))
     env = AnimationMonitor(env)

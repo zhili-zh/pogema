@@ -108,6 +108,25 @@ class Pogema(PogemaBase):
                 xy=gymnasium.spaces.Box(low=-1024, high=1024, shape=(2,), dtype=int),
                 target_xy=gymnasium.spaces.Box(low=-1024, high=1024, shape=(2,), dtype=int),
             )
+        elif self.grid_config.observation_type == 'POMAPF_NEAREST_TARGET':
+            self.observation_space: gymnasium.spaces.Dict = gymnasium.spaces.Dict(
+                obstacles=gymnasium.spaces.Box(0.0, 1.0, shape=(full_size, full_size)),
+                agents=gymnasium.spaces.Box(0.0, 1.0, shape=(full_size, full_size)),
+                xy=gymnasium.spaces.Box(low=-1024, high=1024, shape=(2,), dtype=int),
+                nearest_target=gymnasium.spaces.Box(0.0, 1.0, shape=(full_size, full_size)),
+                nearest_target_owner=gymnasium.spaces.Box(
+                    0.0, 1.0, shape=(self.grid_config.num_agents,), dtype=np.float32,
+                ),
+            )
+        elif self.grid_config.observation_type == 'POMAPF_ALL_TARGETS':
+            self.observation_space: gymnasium.spaces.Dict = gymnasium.spaces.Dict(
+                obstacles=gymnasium.spaces.Box(0.0, 1.0, shape=(full_size, full_size)),
+                agents=gymnasium.spaces.Box(0.0, 1.0, shape=(full_size, full_size)),
+                xy=gymnasium.spaces.Box(low=-1024, high=1024, shape=(2,), dtype=int),
+                target_layers=gymnasium.spaces.Box(
+                    0.0, 1.0, shape=(self.grid_config.num_agents, full_size, full_size), dtype=np.float32,
+                ),
+            )
         elif self.grid_config.observation_type == 'MAPF':
             self.observation_space: gymnasium.spaces.Dict = gymnasium.spaces.Dict(
                 obstacles=gymnasium.spaces.Box(0.0, 1.0, shape=(full_size, full_size)),
@@ -173,6 +192,10 @@ class Pogema(PogemaBase):
             return [self._get_agents_obs(index) for index in range(self.grid_config.num_agents)]
         elif self.grid_config.observation_type == 'POMAPF':
             return self._pomapf_obs()
+        elif self.grid_config.observation_type == 'POMAPF_NEAREST_TARGET':
+            return self._pomapf_nearest_target_obs()
+        elif self.grid_config.observation_type == 'POMAPF_ALL_TARGETS':
+            return self._pomapf_all_targets_obs()
 
         elif self.grid_config.observation_type == 'MAPF':
             results = self._pomapf_obs()
@@ -202,6 +225,38 @@ class Pogema(PogemaBase):
                       'target_xy': targets_xy_relative[agent_idx]}
 
             results.append(result)
+        return results
+
+    def _pomapf_nearest_target_obs(self):
+        results = []
+        agents_xy_relative = self.grid.get_agents_xy_relative()
+
+        for agent_idx in range(self.grid_config.num_agents):
+            nearest_target, nearest_target_owner = self.grid.get_nearest_target_map(agent_idx)
+            result = {
+                'obstacles': self.grid.get_obstacles_for_agent(agent_idx),
+                'agents': self.grid.get_positions(agent_idx),
+                'xy': agents_xy_relative[agent_idx],
+                'nearest_target': nearest_target,
+                'nearest_target_owner': nearest_target_owner,
+            }
+            results.append(result)
+
+        return results
+
+    def _pomapf_all_targets_obs(self):
+        results = []
+        agents_xy_relative = self.grid.get_agents_xy_relative()
+
+        for agent_idx in range(self.grid_config.num_agents):
+            result = {
+                'obstacles': self.grid.get_obstacles_for_agent(agent_idx),
+                'agents': self.grid.get_positions(agent_idx),
+                'xy': agents_xy_relative[agent_idx],
+                'target_layers': self.grid.get_all_targets_layers(agent_idx),
+            }
+            results.append(result)
+
         return results
 
     def _get_infos(self):

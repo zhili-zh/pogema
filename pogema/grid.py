@@ -215,6 +215,50 @@ class Grid:
         result[c.obs_radius - dx, c.obs_radius - dy] = 1
         return result.astype(np.float32)
 
+    def _get_visible_targets(self, agent_id):
+        x, y = self.positions_xy[agent_id]
+        r = self.config.obs_radius
+        visible_targets = []
+
+        for owner_id, (target_x, target_y) in enumerate(self.finishes_xy):
+            if not self.is_active[owner_id]:
+                continue
+
+            dx = target_x - x
+            dy = target_y - y
+            if abs(dx) > r or abs(dy) > r:
+                continue
+
+            local_x = dx + r
+            local_y = dy + r
+            manhattan_distance = abs(dx) + abs(dy)
+            visible_targets.append((owner_id, local_x, local_y, manhattan_distance))
+
+        return visible_targets
+
+    def get_nearest_target_map(self, agent_id):
+        full_size = self.config.obs_radius * 2 + 1
+        nearest_target = np.zeros((full_size, full_size), dtype=np.float32)
+        nearest_target_owner = np.zeros((self.config.num_agents,), dtype=np.float32)
+
+        visible_targets = self._get_visible_targets(agent_id)
+        if not visible_targets:
+            return nearest_target, nearest_target_owner
+
+        owner_id, local_x, local_y, _ = min(visible_targets, key=lambda item: (item[3], item[0]))
+        nearest_target[local_x, local_y] = 1.0
+        nearest_target_owner[owner_id] = 1.0
+        return nearest_target, nearest_target_owner
+
+    def get_all_targets_layers(self, agent_id):
+        full_size = self.config.obs_radius * 2 + 1
+        target_layers = np.zeros((self.config.num_agents, full_size, full_size), dtype=np.float32)
+
+        for owner_id, local_x, local_y, _ in self._get_visible_targets(agent_id):
+            target_layers[owner_id, local_x, local_y] = 1.0
+
+        return target_layers
+
     def render(self, mode='human'):
         render_grid(self.obstacles, self.positions_xy, self.finishes_xy, self.is_active, mode=mode)
 
