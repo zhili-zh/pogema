@@ -101,7 +101,7 @@ class AnimationMonitor(Wrapper):
             obstacles = self.env.get_obstacles(ignore_borders=False)
         history: list[list[AgentState]] = self.env.decompress_history(self.history)
 
-        svg_settings = SvgSettings()
+        svg_settings = self.svg_settings
         colors_cycle = cycle(svg_settings.colors)
         agents_colors = {index: next(colors_cycle) for index in range(self.grid_config.num_agents)}
 

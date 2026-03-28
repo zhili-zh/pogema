@@ -41,6 +41,15 @@ class SvgSettings:
         '#72D5C8',
         '#0ea08c',
         '#8F7B66',
+        '#F4A261',
+        '#E9C46A',
+        '#7CB518',
+        '#577590',
+        '#B56576',
+        '#6D597A',
+        '#F28482',
+        '#84A59D',
+        '#F6BD60',
     )
 
 
@@ -107,7 +116,7 @@ class AnimationDrawer:
         gh = grid_holder
         render_width = gh.height * gh.svg_settings.scale_size + gh.svg_settings.scale_size
         render_height = gh.width * gh.svg_settings.scale_size + gh.svg_settings.scale_size
-        drawing = Drawing(width=render_width, height=render_height, svg_settings=SvgSettings())
+        drawing = Drawing(width=render_width, height=render_height, svg_settings=gh.svg_settings)
         obstacles = self.create_obstacles(gh)
 
         agents = []

@@ -6,6 +6,7 @@ import pytest
 from tabulate import tabulate
 
 from pogema import pogema_v0, AnimationMonitor
+from pogema.svg_animation.animation_drawer import SvgSettings
 
 from pogema.envs import ActionsSampler
 from pogema.grid import GridConfig
@@ -185,6 +186,35 @@ def test_life_long_pogema_animation():
     env = AnimationMonitor(env)
     env.reset()
     run_episode(env=env)
+
+
+def test_animation_uses_extended_color_palette(tmp_path):
+    agents_xy = [[row, col] for row in range(2) for col in range(8)]
+    targets_xy = [[row + 2, col] for row in range(2) for col in range(8)]
+    grid_config = GridConfig(
+        map='''
+        ........
+        ........
+        ........
+        ........
+        ''',
+        num_agents=16,
+        agents_xy=agents_xy,
+        targets_xy=targets_xy,
+        obs_radius=2,
+        on_target='finish',
+    )
+
+    env = AnimationMonitor(pogema_v0(grid_config=grid_config))
+    env.reset()
+
+    output_path = tmp_path / 'palette.svg'
+    env.save_animation(output_path)
+    svg = output_path.read_text()
+
+    assert len(SvgSettings().colors) == 16
+    for color in SvgSettings().colors:
+        assert color in svg
 
 
 def test_custom_positions_and_num_agents():
